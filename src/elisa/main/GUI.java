@@ -36,7 +36,6 @@ public class GUI extends JFrame {
         super("ELISA");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setContentPane(contentPanel);
-
         transitionList.setCellRenderer(new ListCellRenderer<Map.Entry<String, Integer>>() {
             @Override
             public Component getListCellRendererComponent(JList<? extends Map.Entry<String, Integer>> list, Map.Entry<String, Integer> value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -78,7 +77,39 @@ public class GUI extends JFrame {
 
         final DefaultListModel<Map.Entry<String, Integer>> transitionListModel = new DefaultListModel<>();
         transitionList.setModel(transitionListModel);
+        textField1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text = textField1.getText();
+                textField1.setText(null);
 
+                if (text.isEmpty()) {
+                    return;
+                }
+
+                if (analyzer.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                            contentPanel,
+                            "Brak wczytanych tekst\u00f3w!",
+                            null,
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                addMessage(text, false);
+
+                String starting = text.split("\\s+")[0];
+                String response = generator.generate(starting, analyzer);
+                addMessage(response, true);
+
+                String[] split = response.split("\\s+");
+                transitionListModel.clear();
+                for (String word : split) {
+                    transitionListModel.addElement(analyzer.getWord(word));
+                }
+            }
+        });
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
